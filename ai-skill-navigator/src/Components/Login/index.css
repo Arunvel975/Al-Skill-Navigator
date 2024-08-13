@@ -1,0 +1,26 @@
+.bg-container {
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-container {
+  padding: 32px;
+  border: 2px solid black;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.label-text {
+  align-self: flex-start;
+}
+
+.login-button {
+  margin-top: 12px;
+}
