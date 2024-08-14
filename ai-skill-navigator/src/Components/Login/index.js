@@ -11,15 +11,21 @@ class Login extends Component {
           <label className="label-text" htmlFor="usernameInput">
             Username
           </label>
-          <input id="usernameInput"></input>
+          <input className="input-element" id="usernameInput"></input>
           <label className="label-text" htmlFor="passwordInput">
             Password
           </label>
-          <input id="passwordInput"></input>
+          <input
+            className="input-element"
+            id="passwordInput"
+            type="password"
+          ></input>
           <button className="login-button">Login</button>
+          <button className="signup-button">Sign Up</button>
+          <a className="forgot-password">Forgot Password?</a>
+          <h1>Other Options</h1>
+          <button>Login with google</button>
         </form>
-        <h1>Other Options</h1>
-        <button>Login with google</button>
       </div>
     );
   }

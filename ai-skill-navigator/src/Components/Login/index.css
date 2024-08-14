@@ -11,6 +11,8 @@
   padding: 32px;
   border: 2px solid black;
   border-radius: 12px;
+  min-width: 200px;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -23,4 +25,18 @@
 
 .login-button {
   margin-top: 12px;
+}
+
+.signup-button {
+  margin-top: 12px;
+}
+
+.forgot-password {
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+.input-element {
+  width: 100%;
+  margin-top: 2px;
 }
