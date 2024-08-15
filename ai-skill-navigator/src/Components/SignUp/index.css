@@ -1,0 +1,30 @@
+.signup-bg-container {
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.signup-form-container {
+  padding: 32px;
+  border: 2px solid black;
+  border-radius: 12px;
+  min-width: 200px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.signup-label-text {
+    align-self: flex-start;
+}
+
+.signup-input-element {
+    width: 100%;
+    margin-top: 2px;
+    margin-bottom: 12px;
+  }
