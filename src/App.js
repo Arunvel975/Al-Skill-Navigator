@@ -1,23 +1,39 @@
-import "./App.css";
+import React from 'react'
+import { BrowserRouter,Route,Switch } from 'react-router-dom'
+import Home from "./pages/Home"
+import Login from "./pages/Login"
+import Register from "./pages/Register"
+import UserRoute from './components/UserRoute'
+import { useDispatch } from 'react-redux'
+import { useEffect } from 'react'
+import { auth } from './firebase'
+import { setUser } from './redux/actions'
 
-import Login from "./Components/Login";
-import SignUp from "./Components/SignUp";
-import ForgotPassword from "./Components/ForgotPassword";
-import Home from "./Components/Home";
+const App = () => {
+  const dispatch = useDispatch();
 
-import { Routes, Route } from "react-router-dom";
+  useEffect(()=>{
+   auth.onAuthStateChanged((authUser)=>{
+    if(authUser){
+      dispatch(setUser(authUser));
+    }
+    else{
+      dispatch(setUser(null));
+    }
+   })
+  },[dispatch]);
 
-function App() {
   return (
+    <BrowserRouter>
     <div className="app">
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/forgotpassword" element={<ForgotPassword />} />
-        <Route path="/home" element={<Home />} />
-      </Routes>
+        <Switch>
+            <UserRoute path="/" exact component={Home}/>
+            <Route path="/Login"  component={Login}/>
+            <Route path="/Register"  component={Register}/>
+        </Switch>
     </div>
-  );
+    </BrowserRouter>
+  )
 }
 
-export default App;
+export default App
