@@ -82,9 +82,8 @@ export const registerInitiate = (email,password,displayName)=>{
     return function (dispatch){
         dispatch(registerStart());
         auth.createUserWithEmailAndPassword(email,password).then(({user})=>{
-            user.updateProfile({
-                displayName
-            })
+            user.updateProfile({displayName});
+            user.sendEmailVerification();
             dispatch(registerSuccess(user))
         })
         .catch((error)=>dispatch(registerFail(error.message)));

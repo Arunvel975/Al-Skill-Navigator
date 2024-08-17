@@ -1,10 +1,9 @@
-import React from 'react'
-import { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, Link } from 'react-router-dom'
-import "../components/assets/css/Register.css"
-import { registerInitiate } from '../redux/actions'
-
+import React from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory, Link } from 'react-router-dom';
+import "../components/assets/css/Register.css";
+import { registerInitiate } from '../redux/actions';
 
 const Register = () => {
     const [state, setState] = useState({
@@ -12,34 +11,36 @@ const Register = () => {
         email: "",
         password: "",
         passwordConfirm: "",
-    })
+    });
 
-    const {currentUser} = useSelector((state)=>state.user);
+    const { currentUser } = useSelector((state) => state.user);
 
-    const history  = useHistory();
+    const history = useHistory();
 
-    useEffect(()=>{
-        if(currentUser){
-           history.push("/")
+    useEffect(() => {
+        if (currentUser) {
+            history.push("/");
         }
-    }, [currentUser,history]);
+    }, [currentUser, history]);
 
     const dispatch = useDispatch();
-    
+
     const { email, password, displayName, passwordConfirm } = state;
 
-    const handleSubmit = (e) => { 
+    const handleSubmit = (e) => {
         e.preventDefault();
-        if(password !== passwordConfirm){
+        if (password !== passwordConfirm) {
             return;
         }
-        dispatch(registerInitiate(email,password,displayName))
-        setState({email:"",displayName:"",password:"",passwordConfirm:""})
-    }
-    const handleChange = (e) => { 
-        let {name,value} = e.target;
-        setState({...state,[name]:value});
-    }
+        dispatch(registerInitiate(email, password, displayName));
+        setState({ email: "", displayName: "", password: "", passwordConfirm: "" });
+    };
+
+    const handleChange = (e) => {
+        let { name, value } = e.target;
+        setState({ ...state, [name]: value });
+    };
+
     return (
         <div>
             <div id="register-form">
@@ -64,7 +65,6 @@ const Register = () => {
                         value={email}
                         required />
 
-
                     <input type="password"
                         id='inputPassword'
                         className='form-control'
@@ -85,15 +85,14 @@ const Register = () => {
 
                     <button className='btn btn-primary mx-auto ' type='submit' >
                         <i className='fas fa-user-plus'></i> Sign Up</button>
-                   <Link to="/login">
-                    <i className="fas fa-angle-left"></i> Back
-                   </Link>
-                    
+                    <Link to="/login">
+                        <i className="fas fa-angle-left"></i> Back
+                    </Link>
                 </form>
                 <br />
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Register
+export default Register;
