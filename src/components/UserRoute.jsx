@@ -1,12 +1,11 @@
 import React from 'react'
-import { Route } from 'react-router-dom'
+import { Route, Redirect } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import LoadingToRedirect from './LoadingToRedirect'
 
-const UserRoute = ({children,...rest}) => {
-    const {currentUser} = useSelector((state)=>state.user);
+const UserRoute = ({ children, ...rest }) => {
+    const { currentUser } = useSelector((state) => state.user);
 
-   return currentUser ? <Route {...rest} /> :<LoadingToRedirect />
+    return currentUser ? <Route {...rest} /> : <Redirect to="/login" />;
 }
 
 export default UserRoute

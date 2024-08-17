@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import UserRoute from './components/UserRoute';
 import VerifyEmail from './pages/VerifyEmail';
+import ForgetPassword from './pages/ForgetPassword';
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { auth } from './firebase';
@@ -30,6 +31,7 @@ const App = () => {
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
           <Route path="/verify-email" component={VerifyEmail} />
+          <Route path="/forget-password" component={ForgetPassword} />
           <UserRoute path="/" component={Home} /> 
         </Switch>
       </div>
