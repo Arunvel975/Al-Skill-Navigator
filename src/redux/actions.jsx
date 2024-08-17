@@ -78,25 +78,31 @@ export const setUser = (user) =>({
 })
 
 
-export const registerInitiate = (email,password,displayName)=>{
-    return function (dispatch){
+export const registerInitiate = (email, password, displayName) => {
+    return function (dispatch) {
         dispatch(registerStart());
-        auth.createUserWithEmailAndPassword(email,password).then(({user})=>{
-            user.updateProfile({displayName});
+        auth.createUserWithEmailAndPassword(email, password).then(({ user }) => {
+            user.updateProfile({ displayName });
             user.sendEmailVerification();
-            dispatch(registerSuccess(user))
+            dispatch(registerSuccess(user));
+            alert("Registration successful! Please check your email to verify your account.");
         })
-        .catch((error)=>dispatch(registerFail(error.message)));
+        .catch((error) => dispatch(registerFail(error.message)));
     }
 }
 
-export const loginInitiate = (email,password)=>{
-    return function (dispatch){
+export const loginInitiate = (email, password) => {
+    return function (dispatch) {
         dispatch(loginStart());
-        auth.signInWithEmailAndPassword(email,password).then(({user})=>{
-            dispatch(loginSuccess(user))
+        auth.signInWithEmailAndPassword(email, password).then(({ user }) => {
+            if (user.emailVerified) {
+                dispatch(loginSuccess(user));
+            } else {
+                dispatch(loginFail("Please verify your email before logging in."));
+                auth.signOut(); // Sign out the user if email is not verified
+            }
         })
-        .catch((error)=>dispatch(loginFail(error.message)));
+        .catch((error) => dispatch(loginFail(error.message)));
     }
 }
 
