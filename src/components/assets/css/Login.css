@@ -81,8 +81,8 @@ button i{
   margin: 10px auto;
 }
 
-#logreg-forms .facebook-btn {
-  background-color: #3c589c;
+#logreg-forms .github-btn {
+  background-color: #121212;
 }
 
 #logreg-forms .google-btn {
@@ -102,6 +102,18 @@ button i{
   width: 210px !important;
   margin: 0 auto;
 }
+
+.captcha-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.captcha-wrapper iframe {
+  max-width: 100%;
+  height: auto;
+}
+
 
 /* Mobile */
 
@@ -128,11 +140,33 @@ button i{
   #logreg-forms .social-btn span {
     display: none;
   }
-  #logreg-forms .facebook-btn:after {
-    content: "Facebook";
+  #logreg-forms .github-btn:after {
+    content: "GitHub";
+
   }
 
   #logreg-forms .google-btn:after {
     content: "Google+";
   }
+
+  #logreg-forms .form-signup .social-btn {
+    width: 200px;
+  }
+
+  #logreg-forms .form-signup input {
+    margin-bottom: 2px;
+  }
+
+  .captcha-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+
+  .captcha-wrapper iframe {
+    max-width: 100%;
+    overflow-x: auto;
+    height: auto;
+  }
+  
 }

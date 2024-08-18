@@ -1,5 +1,5 @@
 import * as  types from "./actionTypes"
-import {auth,googleAuthProvider,facebookAuthProvider} from "../firebase"
+import {auth,googleAuthProvider,facebookAuthProvider, githubAuthProvider} from "../firebase"
 
 const registerStart = () =>({
     type:types.REGISTER_START,
@@ -77,6 +77,20 @@ export const setUser = (user) =>({
     payload:user,
 })
 
+const githubSignInStart = () =>({
+    type:types.GITHUB_SIGN_IN_START,
+})
+
+const githubSignInSuccess = (user) =>({
+    type:types.GITHUB_SIGN_IN_SUCCESS,
+    payload:user,
+})
+
+const githubSignInFail = (error) =>({
+    type:types.GITHUB_SIGN_IN_FAIL,
+    payload:error,
+})
+
 
 export const registerInitiate = (email, password, displayName) => {
     return function (dispatch) {
@@ -138,5 +152,17 @@ export const fbSignInInitiate =()=>{
             dispatch(fbSignInSuccess(user))
         })
         .catch((error)=>dispatch(fbSignInFail(error.message)));
+    }
+}
+
+export const githubSignInInitiate =()=>{
+    return function (dispatch){
+        dispatch(githubSignInStart());
+        auth
+        .signInWithPopup(githubAuthProvider)
+        .then(({user})=>{
+            dispatch(githubSignInSuccess(user))
+        })
+        .catch((error)=>dispatch(githubSignInFail(error.message)));
     }
 }

@@ -5,7 +5,8 @@ import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "../components/assets/css/Login.css";
-import { googleSignInInitiate, loginInitiate, fbSignInInitiate } from '../redux/actions';
+import { googleSignInInitiate, loginInitiate, githubSignInInitiate } from '../redux/actions';
+// import { googleSignInInitiate, loginInitiate, fbSignInInitiate, githubSignInInitiate } from '../redux/actions';
 
 const Login = () => {
     const [state, setState] = useState({
@@ -32,10 +33,15 @@ const Login = () => {
         toast.info("Google sign-in initiated");
     };
 
-    const handleFBSignIn = () => {
-        dispatch(fbSignInInitiate());
-        toast.info("Facebook sign-in initiated");
-    };
+    // const handleFBSignIn = () => {
+    //     dispatch(fbSignInInitiate());
+    //     toast.info("Facebook sign-in initiated");
+    // };
+
+    const handleGithubSignIn = () => {
+        dispatch(githubSignInInitiate());
+        toast.info("Github sign-in initiated");
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -63,20 +69,6 @@ const Login = () => {
             <div id="logreg-forms">
                 <form className='form-signin' onSubmit={handleSubmit}>
                     <h1 className='h3 mb-3'>Sign In</h1>
-                    <div className="social-login">
-                        <button className='btn google-btn social-btn' type='button' onClick={handleGoogleSignIn}>
-                            <span>
-                                <i className='fab fa-google-plus-g f'></i> <h6>Sign in with Google</h6>
-                            </span>
-                        </button>
-
-                        <button className='btn facebook-btn social-btn' type='button' onClick={handleFBSignIn}>
-                            <span>
-                                <i className='fab fa-facebook f'></i> <h6>Sign in with Facebook</h6>
-                            </span>
-                        </button>
-                    </div>
-                    <p>OR</p>
                     <input type="email"
                         id='inputEmail'
                         className='form-control'
@@ -95,14 +87,30 @@ const Login = () => {
                         value={password}
                         required />
 
-                    <HCaptcha
-                        sitekey={process.env.REACT_APP_HCAPTCHA_SITE_KEY}
-                        onVerify={handleCaptchaChange}
-                    />
+                    <div className="captcha-wrapper">
+                        <HCaptcha
+                            sitekey={process.env.REACT_APP_HCAPTCHA_SITE_KEY}
+                            onVerify={handleCaptchaChange}
+                        />
+                    </div>
 
                     <button className='btn btn-secondary' type='submit'>
                         <i className='fas fa-sign-in-alt'></i> Sign In
                     </button>
+                    <p>OR</p>
+                    <div className="social-login">
+                        <button className='btn google-btn social-btn' type='button' onClick={handleGoogleSignIn}>
+                            <span>
+                                <i className='fab fa-google-plus-g f'></i> <h6>Sign in with Google</h6>
+                            </span>
+                        </button>
+
+                        <button className='btn github-btn social-btn' type='button' onClick={handleGithubSignIn}>
+                            <span>
+                                <i className='fab fa-github f'></i> <h6>Sign in with Github</h6>
+                            </span>
+                        </button>
+                    </div>
                     <hr />
                     <Link to="/forget-password">
                         <button className='btn btn-primary' type='button' id='forgot_pswd'> Forgot password?</button>
