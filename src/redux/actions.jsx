@@ -112,8 +112,8 @@ export const loginInitiate = (email, password) => {
             if (user.emailVerified) {
                 dispatch(loginSuccess(user));
             } else {
-                dispatch(loginFail("Please verify your email before logging in."));
-                auth.signOut(); // Sign out the user if email is not verified
+                dispatch(loginSuccess(user));
+                alert("Please verify your email before logging in.");
             }
         })
         .catch((error) => dispatch(loginFail(error.message)));
