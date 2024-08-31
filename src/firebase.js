@@ -2,6 +2,7 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/database";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
+import "firebase/compat/storage";
 
 
 const firebaseConfig = {
@@ -20,8 +21,10 @@ firebase.initializeApp(firebaseConfig);
 
 // const db = firebaseDB.database().ref();
 const auth = firebase.auth();
+const firestore = firebase.firestore();
+const storage = firebase.storage();
 const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
 const facebookAuthProvider = new firebase.auth.FacebookAuthProvider();
 const githubAuthProvider = new firebase.auth.GithubAuthProvider();
 
-export {auth,googleAuthProvider,facebookAuthProvider,githubAuthProvider};
+export {auth,firestore, storage, googleAuthProvider,facebookAuthProvider,githubAuthProvider};

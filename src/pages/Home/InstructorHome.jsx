@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { logoutInitiate } from '../redux/actions';
+import { logoutInitiate } from '../../redux/actions';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
@@ -29,7 +29,7 @@ const Home = () => {
     <div>
       <ToastContainer position="bottom-right" />
       <h2 style={{ textAlign: "center", fontWeight: "bold", marginTop: "30px" }}>
-        Welcome to our Homepage
+        Welcome to our Instructor Homepage
       </h2>
       <br />
       <button

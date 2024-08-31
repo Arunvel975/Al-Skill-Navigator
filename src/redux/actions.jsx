@@ -1,5 +1,6 @@
 import * as  types from "./actionTypes"
-import {auth,googleAuthProvider,facebookAuthProvider, githubAuthProvider} from "../firebase"
+import {auth,googleAuthProvider, githubAuthProvider} from "../firebase"
+import {firestore} from "../firebase"
 
 const registerStart = () =>({
     type:types.REGISTER_START,
@@ -44,20 +45,6 @@ const googleSignInFail = (error) =>({
     payload:error,
 })
 
-const fbSignInStart = () =>({
-    type:types.FACEBOOK_SIGN_IN_START,
-})
-
-const fbSignInSuccess = (user) =>({
-    type:types.FACEBOOK_SIGN_IN_SUCCESS,
-    payload:user,
-})
-
-const fbSignInFail = (error) =>({
-    type:types.FACEBOOK_SIGN_IN_FAIL,
-    payload:error,
-})
-
 
 const logoutStart = () =>({
     type:types.LOGOUT_START,
@@ -92,14 +79,18 @@ const githubSignInFail = (error) =>({
 })
 
 
-export const registerInitiate = (email, password, displayName) => {
+export const registerInitiate = (email, password, displayName, role) => {
     return function (dispatch) {
         dispatch(registerStart());
         auth.createUserWithEmailAndPassword(email, password).then(({ user }) => {
-            user.updateProfile({ displayName });
             user.sendEmailVerification();
+            firestore.collection('users').doc(user.uid).set({
+                displayName,
+                email,
+                role,
+                profile: {}
+            });
             dispatch(registerSuccess(user));
-            alert("Registration successful! Please check your email to verify your account.");
         })
         .catch((error) => dispatch(registerFail(error.message)));
     }
@@ -131,38 +122,52 @@ export const logoutInitiate = ()=>{
 }
 
 
-export const googleSignInInitiate =()=>{
-    return function (dispatch){
+export const googleSignInInitiate = () => {
+    return async (dispatch) => {
         dispatch(googleSignInStart());
-        auth
-        .signInWithPopup(googleAuthProvider)
-        .then(({user})=>{
-            dispatch(googleSignInSuccess(user))
-        })
-        .catch((error)=>dispatch(googleSignInFail(error.message)));
-    }
-}
+        try {
+            const { user } = await auth.signInWithPopup(googleAuthProvider);
+            const userDoc = await firestore.collection('users').doc(user.uid).get();
+            let isNewUser = false;
+            if (!userDoc.exists) {
+                await firestore.collection('users').doc(user.uid).set({
+                    displayName: user.displayName,
+                    email: user.email,
+                    role: 'Candidate',
+                    profile: {}
+                });
+                isNewUser = true;
+            }
+            dispatch(googleSignInSuccess(user));
+            return isNewUser;
+        } catch (error) {
+            dispatch(googleSignInFail(error.message));
+            return false;
+        }
+    };
+};
 
-export const fbSignInInitiate =()=>{
-    return function (dispatch){
-        dispatch(fbSignInStart());
-        auth
-        .signInWithPopup(facebookAuthProvider.addScope("user_birthday,email"))
-        .then(({user})=>{
-            dispatch(fbSignInSuccess(user))
-        })
-        .catch((error)=>dispatch(fbSignInFail(error.message)));
-    }
-}
-
-export const githubSignInInitiate =()=>{
-    return function (dispatch){
+export const githubSignInInitiate = () => {
+    return async (dispatch) => {
         dispatch(githubSignInStart());
-        auth
-        .signInWithPopup(githubAuthProvider)
-        .then(({user})=>{
-            dispatch(githubSignInSuccess(user))
-        })
-        .catch((error)=>dispatch(githubSignInFail(error.message)));
-    }
-}
+        try {
+            const { user } = await auth.signInWithPopup(githubAuthProvider);
+            const userDoc = await firestore.collection('users').doc(user.uid).get();
+            let isNewUser = false;
+            if (!userDoc.exists) {
+                await firestore.collection('users').doc(user.uid).set({
+                    displayName: user.displayName,
+                    email: user.email,
+                    role: 'Candidate',
+                    profile: {}
+                });
+                isNewUser = true;
+            }
+            dispatch(githubSignInSuccess(user));
+            return isNewUser;
+        } catch (error) {
+            dispatch(githubSignInFail(error.message));
+            return false;
+        }
+    };
+};

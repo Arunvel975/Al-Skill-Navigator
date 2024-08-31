@@ -28,20 +28,23 @@ const Login = () => {
     const dispatch = useDispatch();
     const { email, password } = state;
 
-    const handleGoogleSignIn = () => {
-        dispatch(googleSignInInitiate());
-        toast.info("Google sign-in initiated");
+    const handleGoogleSignIn = async () => {
+        const isNewUser = await dispatch(googleSignInInitiate());
+        toast.success("Google Sign In initiated");
+        if (isNewUser) {
+            history.push('/profile-setup'); // Navigate if user data does not exist
+            toast.success("New user detected, please complete your profile");
+        }
     };
 
-    // const handleFBSignIn = () => {
-    //     dispatch(fbSignInInitiate());
-    //     toast.info("Facebook sign-in initiated");
-    // };
-
-    const handleGithubSignIn = () => {
-        dispatch(githubSignInInitiate());
-        toast.info("Github sign-in initiated");
-    }
+    const handleGithubSignIn = async () => {
+        const isNewUser = await dispatch(githubSignInInitiate());
+        toast.success("Github Sign In initiated");
+        if (isNewUser) {
+            history.push('/profile-setup'); // Navigate if user data does not exist
+            toast.success("New user detected, please complete your profile");
+        }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();

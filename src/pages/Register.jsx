@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import "../components/assets/css/Register.css";
 import { registerInitiate } from '../redux/actions';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 
@@ -13,43 +12,53 @@ const Register = () => {
         email: "",
         password: "",
         passwordConfirm: "",
+        role: ""
     });
 
     const { currentUser } = useSelector((state) => state.user);
     const [captchaToken, setCaptchaToken] = useState(null);
 
-    const history = useHistory();
+    const history = useHistory(); // Correct usage of useHistory
 
     useEffect(() => {
         if (currentUser) {
-            history.push("/");
-            toast.success("Registration successful!");
+            if (currentUser.role === "Admin" ) {
+                history.push("/admin-home"); 
+                if (currentUser.role === "Instructor") {
+                    history.push("/instructor-home");
+                }
+                toast.success("Registration successful! Redirecting.");
+            } else {
+                history.push("/profile-setup"); // Redirect to profile setup for other roles
+                toast.success("Registration successful! Please complete your profile.");
+            }
         }
     }, [currentUser, history]);
 
     const dispatch = useDispatch();
 
-    const { email, password, displayName, passwordConfirm } = state;
+    const { email, password, displayName, passwordConfirm, role } = state;
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (password !== passwordConfirm || !email || !password || !displayName || !captchaToken) {
+        if (password !== passwordConfirm || !email || !password || !displayName || !role || !captchaToken) {
             toast.error("Please fill in all fields correctly and complete the captcha");
             return;
         }
-        dispatch(registerInitiate(email, password, displayName));
-        setState({ email: "", displayName: "", password: "", passwordConfirm: "" });
+        dispatch(registerInitiate(email, password, displayName, role));
+        setState({ email: "", displayName: "", password: "", passwordConfirm: "", role: "" });
         toast.success("Registration initiated");
     };
 
     const handleChange = (e) => {
-        let { name, value } = e.target;
+        const { name, value } = e.target;
         setState({ ...state, [name]: value });
     };
 
     const handleCaptchaChange = (token) => {
         setCaptchaToken(token);
     }
+
 
     return (
         <div>
@@ -93,6 +102,13 @@ const Register = () => {
                         onChange={handleChange}
                         value={passwordConfirm}
                         required />
+
+                    <select name="role" value={role} onChange={handleChange} required>
+                        <option value="">Select Role</option>
+                        <option value="Candidate">Candidate</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Instructor">Instructor</option>
+                    </select>
                         
                     <HCaptcha
                         sitekey={process.env.REACT_APP_HCAPTCHA_SITE_KEY}
