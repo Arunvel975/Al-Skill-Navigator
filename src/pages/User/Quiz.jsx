@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, updateDoc, addDoc } from 'firebase/firestore';
 import { auth, db } from '../../config/firebaseConfig';
 import { getAuth } from 'firebase/auth';
 import { ClipLoader } from 'react-spinners';
@@ -13,6 +13,8 @@ const Quiz = () => {
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [score, setScore] = useState(null);
+    const [timer, setTimer] = useState(null);
+    const [timeLeft, setTimeLeft] = useState(null);
 
     const navigate = useNavigate();
 
@@ -34,7 +36,7 @@ const Quiz = () => {
                 const courseSnapshot = await getDocs(courseCollectionRef);
 
                 const validCourses = courseSnapshot.docs
-                    .filter(courseDoc => enrolledCourseIds.includes(courseDoc.id)) // Filter only enrolled courses that exist (cuz any enrolled course might be deleted in past)
+                    .filter(courseDoc => enrolledCourseIds.includes(courseDoc.id))
                     .map(courseDoc => ({
                         id: courseDoc.id,
                         ...courseDoc.data()
@@ -59,7 +61,9 @@ const Quiz = () => {
                 if (courseSnapshot.exists()) {
                     const courseData = courseSnapshot.data();
                     setQuiz(courseData.quiz || []);
-                    setUserAnswers(new Array(courseData.quiz?.length).fill(null)); // Initialize with null answers
+                    setUserAnswers(new Array(courseData.quiz?.length).fill(null));
+                    setTimer(courseData.timer || 0);
+                    setTimeLeft(courseData.timer * 60); // Convert minutes to seconds
                 } else {
                     console.log('No such document!');
                     setQuiz([]);
@@ -75,6 +79,23 @@ const Quiz = () => {
 
         fetchQuiz();
     }, [selectedCourseId]);
+
+    useEffect(() => {
+        if (timeLeft === null || timeLeft <= 0) return;
+
+        const timerId = setInterval(() => {
+            setTimeLeft(prevTime => {
+                if (prevTime <= 1) {
+                    clearInterval(timerId);
+                    handleSubmit();
+                    return 0;
+                }
+                return prevTime - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(timerId);
+    }, [timeLeft]);
 
     const handleAnswerSelect = (questionIndex, selectedOption) => {
         const updatedAnswers = [...userAnswers];
@@ -111,6 +132,15 @@ const Quiz = () => {
             await updateDoc(userDocRef, { quizzes });
 
             calculateScore();
+
+            // Store results in a separate Firestore collection
+            await addDoc(collection(db, 'quizResults'), {
+                userId: user.uid,
+                courseId: selectedCourseId,
+                userAnswers: userAnswers,
+                score: calculateScore(),
+                timestamp: new Date()
+            });
         }
     };
 
@@ -123,18 +153,19 @@ const Quiz = () => {
         });
 
         setScore(correctAnswers);
+        return correctAnswers;
     };
 
     const goDashboard = () => {
-      navigate(`/user`);
-    }
+        navigate(`/user`);
+    };
 
     if (loading) {
-      return (
-        <div className="flex items-center justify-center min-h-screen">
-          <ClipLoader color="#3498db" size={100} cssOverride={{ borderWidth: '5px' }} />
-        </div>
-      );
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <ClipLoader color="#3498db" size={100} cssOverride={{ borderWidth: '5px' }} />
+            </div>
+        );
     }
 
     return (
@@ -143,7 +174,7 @@ const Quiz = () => {
 
             {loading ? (
                 <div className="flex items-center justify-center min-h-screen">
-                  <ClipLoader color="#3498db" size={100} cssOverride={{ borderWidth: '5px' }} />
+                    <ClipLoader color="#3498db" size={100} cssOverride={{ borderWidth: '5px' }} />
                 </div>
             ) : (
                 <>
@@ -167,6 +198,12 @@ const Quiz = () => {
 
                     {selectedCourseId && quiz.length === 0 && !loading && (
                         <p className="text-red-500">No quiz available for this course.</p>
+                    )}
+
+                    {timeLeft !== null && (
+                        <div className="mt-6 text-center">
+                            <h2 className="text-xl font-semibold">Time Left: {Math.floor(timeLeft / 60)}:{timeLeft % 60}</h2>
+                        </div>
                     )}
 
                     {quiz.length > 0 && !submitted && (

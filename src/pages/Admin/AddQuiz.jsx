@@ -10,6 +10,8 @@ const AddQuiz = () => {
   const [newQuestion, setNewQuestion] = useState('');
   const [options, setOptions] = useState(['', '', '', '']);
   const [correctOption, setCorrectOption] = useState('');
+  const [questionType, setQuestionType] = useState('multiple-choice');
+  const [timer, setTimer] = useState(0);
 
   const navigate = useNavigate();
 
@@ -25,15 +27,16 @@ const AddQuiz = () => {
   }, []);
 
   const handleAddQuestion = () => {
-    if (!newQuestion || options.includes('') || !correctOption) {
+    if (!newQuestion || (questionType === 'multiple-choice' && (options.includes('') || !correctOption))) {
       alert('Please fill in all fields correctly.');
       return;
     }
 
     const question = {
       question: newQuestion,
-      options: options,
-      correctAnswer: correctOption
+      type: questionType,
+      options: questionType === 'multiple-choice' ? options : [],
+      correctAnswer: questionType === 'multiple-choice' ? correctOption : '',
     };
 
     setQuestions([...questions, question]);
@@ -52,7 +55,8 @@ const AddQuiz = () => {
       const courseRef = doc(db, 'courses', selectedCourseId);
 
       await updateDoc(courseRef, {
-        quiz: questions
+        quiz: questions,
+        timer: timer
       });
 
       alert('Quiz added successfully!');
@@ -82,7 +86,26 @@ const AddQuiz = () => {
       </div>
 
       <div className="mb-6">
+        <label className="block text-lg font-medium mb-2">Quiz Timer (in minutes):</label>
+        <input
+          type="number"
+          value={timer}
+          onChange={(e) => setTimer(e.target.value)}
+          className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
+
+      <div className="mb-6">
         <h2 className="text-xl font-semibold mb-4">Add Question</h2>
+        <label className="block text-lg font-medium mb-2">Question Type:</label>
+        <select
+          value={questionType}
+          onChange={(e) => setQuestionType(e.target.value)}
+          className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        >
+          <option value="multiple-choice">Multiple Choice</option>
+        </select>
+
         <input
           type="text"
           value={newQuestion}
@@ -90,35 +113,42 @@ const AddQuiz = () => {
           placeholder="Enter question"
           className="block w-full p-2 border border-gray-300 rounded-md shadow-sm mb-4 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          {options.map((option, index) => (
-            <input
-              key={index}
-              type="text"
-              value={option}
-              onChange={(e) => {
-                const newOptions = [...options];
-                newOptions[index] = e.target.value;
-                setOptions(newOptions);
-              }}
-              placeholder={`Option ${index + 1}`}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
-          ))}
-        </div>
-        <div className="mb-4">
-          <label className="block text-lg font-medium mb-2">Correct Option:</label>
-          <select
-            value={correctOption}
-            onChange={(e) => setCorrectOption(e.target.value)}
-            className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          >
-            <option value="">Select correct option</option>
+
+        {questionType === 'multiple-choice' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             {options.map((option, index) => (
-              <option key={index} value={option}>Option {index + 1}</option>
+              <input
+                key={index}
+                type="text"
+                value={option}
+                onChange={(e) => {
+                  const newOptions = [...options];
+                  newOptions[index] = e.target.value;
+                  setOptions(newOptions);
+                }}
+                placeholder={`Option ${index + 1}`}
+                className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
             ))}
-          </select>
-        </div>
+          </div>
+        )}
+
+        {questionType === 'multiple-choice' && (
+          <div className="mb-4">
+            <label className="block text-lg font-medium mb-2">Correct Option:</label>
+            <select
+              value={correctOption}
+              onChange={(e) => setCorrectOption(e.target.value)}
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="">Select correct option</option>
+              {options.map((option, index) => (
+                <option key={index} value={option}>Option {index + 1}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <button
           onClick={handleAddQuestion}
           className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -133,11 +163,13 @@ const AddQuiz = () => {
           {questions.map((q, index) => (
             <li key={index} className="mb-4">
               <strong>{q.question}</strong>
-              <ul className="list-disc pl-5">
-                {q.options.map((opt, i) => (
-                  <li key={i}>{opt} {opt === q.correctAnswer && <span className="text-green-500">(Correct)</span>}</li>
-                ))}
-              </ul>
+              {q.type === 'multiple-choice' && (
+                <ul className="list-disc pl-5">
+                  {q.options.map((opt, i) => (
+                    <li key={i}>{opt} {opt === q.correctAnswer && <span className="text-green-500">(Correct)</span>}</li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))}
         </ul>
