@@ -1,9 +1,11 @@
 // api/generateText.js
-import { OpenAIApi } from 'openai';
+import { OpenAI } from 'openai';
 
-const openai = new OpenAIApi({
+const configuration = new Configuration({
   apiKey: import.meta.env.VITE_APP_OPENAI_API_KEY,
 });
+
+const openai = new OpenAI(configuration);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
