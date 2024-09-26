@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc, query } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_APP_FIREBASE_API,
@@ -17,24 +18,27 @@ const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 const githubProvider = new GithubAuthProvider();
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 const signInWithProvider = async (provider, setUserRole, setIsAuthenticated, navigate) => {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
-    const userQuery = query(doc(db, 'users', user.uid));
-    const userDoc = await getDoc(userQuery);
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
 
     if (userDoc.exists()) {
       const userData = userDoc.data();
       setUserRole(userData.role);
       setIsAuthenticated(true);
 
-      if (userData.isFormFilled) {
-        navigate(userData.role === 'admin' ? '/admin' : '/user');
+      if (userData.role === 'admin') {
+        navigate('/admin');
+      } else if (userData.isFormFilled) {
+        navigate('/user');
       } else {
-        navigate('/candidate-form');
+        navigate('/user/candidate-form');
       }
     } else {
       const role = prompt("Please enter your role (admin/user):", "user");
@@ -44,7 +48,7 @@ const signInWithProvider = async (provider, setUserRole, setIsAuthenticated, nav
       }
 
       const registrationDate = new Date().toISOString();
-      await setDoc(doc(db, 'users', user.uid), { 
+      await setDoc(userDocRef, { 
         role, 
         registrationDate,
         isFormFilled: false
@@ -52,7 +56,12 @@ const signInWithProvider = async (provider, setUserRole, setIsAuthenticated, nav
 
       setUserRole(role);
       setIsAuthenticated(true);
-      navigate('/user/candidate-form');
+
+      if (role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/user/candidate-form');
+      }
     }
   } catch (error) {
     console.error("Error during sign-in:", error);
@@ -60,4 +69,4 @@ const signInWithProvider = async (provider, setUserRole, setIsAuthenticated, nav
   }
 };
 
-export { auth, googleProvider, githubProvider, signInWithProvider, db };
+export { auth, googleProvider, githubProvider, signInWithProvider, db, storage };

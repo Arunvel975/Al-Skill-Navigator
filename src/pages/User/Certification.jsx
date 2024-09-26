@@ -69,7 +69,7 @@ const Certification = () => {
   
     // Add logo
     if (logoUrl) {
-      const logoWidth = 210; // Increased width
+      const logoWidth = 150; // Increased width
       const logoHeight = 150; // Increased height
       const logoX = doc.internal.pageSize.getWidth() - 20 - logoWidth; // 20 pt margin from the right edge
       const logoY = 30; // Margin from the top
@@ -105,13 +105,13 @@ const Certification = () => {
   
     // Add footer
     doc.setFontSize(14);
-    doc.text('This certificate is issued by Learnify', doc.internal.pageSize.getWidth() / 2, 440, { align: 'center' });
+    doc.text('This certificate is issued by Hexaware AI Skill Team', doc.internal.pageSize.getWidth() / 2, 440, { align: 'center' });
   
     // Add stylish signature
     doc.setFontSize(18);
     doc.setFont('courier', 'italic'); // Using Courier Italic for a signature-like appearance
     doc.text(`Signed,`, doc.internal.pageSize.getWidth() - 150, doc.internal.pageSize.getHeight() - 60, { align: 'right' });
-    doc.text(`Learnify Team`, doc.internal.pageSize.getWidth() - 150, doc.internal.pageSize.getHeight() - 40, { align: 'right' });
+    doc.text(`Hexaware AI Skill Team`, doc.internal.pageSize.getWidth() - 150, doc.internal.pageSize.getHeight() - 40, { align: 'right' });
   
     // Save the document
     doc.save(`${course.name}_Certificate.pdf`);
