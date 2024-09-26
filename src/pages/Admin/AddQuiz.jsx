@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebaseConfig';
 import { useNavigate } from 'react-router-dom';
-import { generateText } from '../../services/genAI';
 
 const AddQuiz = () => {
   const [courses, setCourses] = useState([]);
@@ -13,8 +12,6 @@ const AddQuiz = () => {
   const [correctOption, setCorrectOption] = useState('');
   const [questionType, setQuestionType] = useState('multiple-choice');
   const [timer, setTimer] = useState(0);
-  const [generatedQuestion, setGeneratedQuestion] = useState('');
-  const [topic, setTopic] = useState('');
 
   const navigate = useNavigate();
 
@@ -28,33 +25,6 @@ const AddQuiz = () => {
 
     fetchCourses();
   }, []);
-
-  const handleGenerateQuestion = async () => {
-    if (!topic) {
-      alert('Please provide a topic.');
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/generateText', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt: `Generate a multiple-choice question about ${topic}.` }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error generating text');
-      }
-
-      const data = await response.json();
-      setGeneratedQuestion(data.text);
-    } catch (error) {
-      alert(`Error generating question: ${error.message}`);
-    }
-  };
 
   const handleAddQuestion = () => {
     if (!newQuestion || (questionType === 'multiple-choice' && (options.includes('') || !correctOption))) {
@@ -100,19 +70,7 @@ const AddQuiz = () => {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-4xl text-center font-bold mb-6">Add Quiz</h1>
-      <input
-        type="text"
-        value={topic}
-        onChange={(e) => setTopic(e.target.value)}
-        placeholder="Enter topic"
-        className="border p-2 mb-4 w-full"
-      />
-      <button onClick={handleGenerateQuestion} className="bg-blue-500 text-white py-2 px-4 rounded">
-        Generate Question
-      </button>
-      {generatedQuestion && <p className="mt-4">{generatedQuestion}</p>}
 
-      <hr className="my-6" />
       <div className="mb-6">
         <label className="block text-lg font-medium mb-2">Select Course:</label>
         <select
@@ -136,6 +94,7 @@ const AddQuiz = () => {
           className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />
       </div>
+
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-4">Add Question</h2>
         <label className="block text-lg font-medium mb-2">Question Type:</label>
