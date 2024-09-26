@@ -111,7 +111,7 @@ const AdminDashboard = () => {
         <div className="bg-blue-500 text-white p-4 md:p-8 rounded-lg mb-6 flex flex-col md:flex-row justify-between items-center sm:overflow-hidden md:overflow-hidden">
           <h1 className="text-xl md:text-2xl font-semibold flex mb-4 md:mb-0 sm:overflow-hidden md:overflow-hidden sm:whitespace-nowrap md:whitespace-nowrap">
             <span className="animate-typewriter sm:truncate md:truncate">
-              Welcome to Learnify, {userName}!
+              Welcome to Hexaware AI Skill, {userName}!
             </span>
           </h1>
           <UserAvatar name={userName} picture={picture} />
